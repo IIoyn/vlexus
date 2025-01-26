@@ -1,201 +1,171 @@
-getgenv().VlexusHub = {
-    name = "Vlexus Hub",
-    version = "9.1",
-    tabs = {
-        "Combat",
-        "Visuals",
-        "Movement",
-        "Rage",
-        "Misc",
-        "World"
+getgenv().G = {
+    n = "Vlexus Hub",
+    v = "9.1",
+    t = {
+        "Combat", "Visuals", "Movement", "Rage", "Misc", "World"
     },
-    colorScheme = {
-        background = Color3.fromRGB(25, 25, 25),
-        primary = Color3.fromRGB(50, 120, 220),
-        secondary = Color3.fromRGB(220, 70, 70),
-        text = Color3.fromRGB(255, 255, 255),
-        highlight = Color3.fromRGB(80, 200, 120),
-        slider = Color3.fromRGB(200, 200, 200)
+    cS = {
+        b = Color3.fromRGB(25, 25, 25),
+        p = Color3.fromRGB(50, 120, 220),
+        s = Color3.fromRGB(220, 70, 70),
+        t = Color3.fromRGB(255, 255, 255),
+        h = Color3.fromRGB(80, 200, 120),
+        sl = Color3.fromRGB(200, 200, 200)
     },
-    features = {
-        -- Combat
-        silentAimEnabled = false,
-        silentAimPrediction = 0.13444,  -- Predeterminada
-        camlockEnabled = false,
-        camlockPrediction = 0.1,        -- Predicción ajustable
-        targetAimEnabled = false,
-        rageModeEnabled = false,
+    f = {
+        saE = false, 
+        saP = 0.13444,  
+        clE = false,
+        clP = 0.1,
+        taE = false,
+        rE = false,
 
-        -- Visuals
-        espBox = false,
-        espSkeleton = false,
-        espGlow = false,
-        tracersEnabled = false,
-        fovCircleEnabled = false,
+        esb = false, 
+        ess = false, 
+        esg = false,
+        teE = false,
+        fovE = false,
 
-        -- Movement
-        flyEnabled = false,
-        cframeSpeedEnabled = false,
-        noclipEnabled = false,
-        superJumpEnabled = false,
-        dashesEnabled = false,
-        longJumpEnabled = false,
-        wallRunEnabled = false,
-        crouchJumpEnabled = false,
-        sprintEnabled = false,           -- Habilita sprint
-        hoverboardEnabled = false,      -- Habilita hoverboard
-        teleportationEnabled = false,   -- Habilita teletransportación
-        speedHackEnhanced = false,      -- Speed Hack Mejorado
-        teleportLocations = {
-            ["Spawn"] = Vector3.new(0, 10, 0),
-            ["Shop"] = Vector3.new(50, 5, 100),
+        fE = false,
+        csE = false,
+        neE = false,
+        sjE = false,
+        dsE = false,
+        ljE = false,
+        wrE = false,
+        cjE = false,
+        spE = false,          
+        hbE = false,      
+        tE = false,   
+        sHE = false,      
+        tl = {
+            ["S"] = Vector3.new(0, 10, 0),
+            ["Sh"] = Vector3.new(50, 5, 100),
         },
 
-        -- Rage
-        autoAirEnabled = false,
-        fakeLagEnabled = false,
-        quickTurnEnabled = false,
-        antiaimEnabled = false,
-        hitboxExpanderEnabled = false,  -- Activador para Hitbox Expander
-        hitboxSize = 25,               -- Tamaño predeterminado de la hitbox
-        maxHitboxSize = 200,           -- Tamaño máximo de la hitbox
+        aA = false,
+        fL = false,
+        qT = false,
+        aaiE = false,
+        hBE = false,  
+        hS = 25,               
+        mH = 200,           
     }
 }
 
--- Función para crear interruptores en la UI
-local function createSwitch(parent, label, value, callback)
-    local switchFrame = Instance.new("Frame", parent)
-    switchFrame.Size = UDim2.new(0, 200, 0, 40)
-    switchFrame.BackgroundColor3 = getgenv().VlexusHub.colorScheme.background
+local function crSw(p, l, v, cb)
+    local sf = Instance.new("Frame")
+    sf.Size = UDim2.new(0, 200, 0, 40)
+    sf.BackgroundColor3 = getgenv().G.cS.b
+    sf.Parent = p
 
-    local labelText = Instance.new("TextLabel", switchFrame)
-    labelText.Size = UDim2.new(0.7, 0, 1, 0)
-    labelText.Text = label
-    labelText.TextColor3 = getgenv().VlexusHub.colorScheme.text
+    local lT = Instance.new("TextLabel")
+    lT.Size = UDim2.new(0.7, 0, 1, 0)
+    lT.Text = l
+    lT.TextColor3 = getgenv().G.cS.t
+    lT.Parent = sf
 
-    local switchButton = Instance.new("TextButton", switchFrame)
-    switchButton.Size = UDim2.new(0.3, 0, 1, 0)
-    switchButton.Text = value and "On" or "Off"
-    switchButton.BackgroundColor3 = value and getgenv().VlexusHub.colorScheme.highlight or getgenv().VlexusHub.colorScheme.secondary
+    local sB = Instance.new("TextButton")
+    sB.Size = UDim2.new(0.3, 0, 1, 0)
+    sB.Text = v and "On" or "Off"
+    sB.BackgroundColor3 = v and getgenv().G.cS.h or getgenv().G.cS.s
+    sB.Parent = sf
 
-    switchButton.MouseButton1Click:Connect(function()
-        value = not value
-        switchButton.Text = value and "On" or "Off"
-        switchButton.BackgroundColor3 = value and getgenv().VlexusHub.colorScheme.highlight or getgenv().VlexusHub.colorScheme.secondary
-        callback(value)
+    sB.MouseButton1Click:Connect(function()
+        v = not v
+        sB.Text = v and "On" or "Off"
+        sB.BackgroundColor3 = v and getgenv().G.cS.h or getgenv().G.cS.s
+        cb(v)
     end)
 end
 
--- Función para crear sliders
-local function createSlider(parent, label, value, minValue, maxValue, callback)
-    local sliderFrame = Instance.new("Frame", parent)
-    sliderFrame.Size = UDim2.new(0, 200, 0, 40)
-    sliderFrame.BackgroundColor3 = getgenv().VlexusHub.colorScheme.background
+local function crSl(p, l, v, min, max, cb)
+    local sf = Instance.new("Frame")
+    sf.Size = UDim2.new(0, 200, 0, 40)
+    sf.BackgroundColor3 = getgenv().G.cS.b
+    sf.Parent = p
 
-    local labelText = Instance.new("TextLabel", sliderFrame)
-    labelText.Size = UDim2.new(0.7, 0, 1, 0)
-    labelText.Text = label
-    labelText.TextColor3 = getgenv().VlexusHub.colorScheme.text
+    local lT = Instance.new("TextLabel")
+    lT.Size = UDim2.new(0.7, 0, 1, 0)
+    lT.Text = l
+    lT.TextColor3 = getgenv().G.cS.t
+    lT.Parent = sf
 
-    -- Barra deslizante
-    local slider = Instance.new("Frame", sliderFrame)
+    local slider = Instance.new("Frame")
     slider.Size = UDim2.new(0, 160, 0, 10)
-    slider.BackgroundColor3 = getgenv().VlexusHub.colorScheme.primary
+    slider.BackgroundColor3 = getgenv().G.cS.p
     slider.Position = UDim2.new(0, 35, 0, 25)
+    slider.Parent = sf
 
-    -- Agregar el control deslizante
-    local handle = Instance.new("Frame", slider)
-    handle.Size = UDim2.new(0, 20, 0, 20)
-    handle.Position = UDim2.new(0, value, 0, -5)
-    handle.BackgroundColor3 = getgenv().VlexusHub.colorScheme.secondary
-    handle.MouseDrag:Connect(function(input)
-        local newX = math.clamp(input.Position.X - slider.AbsolutePosition.X, 0, 140)
-        handle.Position = UDim2.new(0, newX, 0, -5)
-        callback(math.floor(newX / 140 * (maxValue - minValue) + minValue))
+    local hndl = Instance.new("Frame")
+    hndl.Size = UDim2.new(0, 20, 0, 20)
+    hndl.Position = UDim2.new(0, v, 0, -5)
+    hndl.BackgroundColor3 = getgenv().G.cS.s
+    hndl.Parent = slider
+    hndl.MouseDrag:Connect(function(i)
+        local nx = math.clamp(i.Position.X - slider.AbsolutePosition.X, 0, 140)
+        hndl.Position = UDim2.new(0, nx, 0, -5)
+        cb(math.floor(nx / 140 * (max - min) + min))
     end)
 end
 
--- Función de ajuste de tamaño de la hitbox
-local function updateHitboxSize(size)
-    local character = game.Players.LocalPlayer.Character
-    if character then
-        local humanoid = character:FindFirstChild("Humanoid")
-        if humanoid then
-            humanoid.HipWidth = size
-            humanoid.HipHeight = size
-            humanoid.BodyWidthScale = 1.5
-            humanoid.BodyHeightScale = 1.5
-            humanoid.BodyDepthScale = 1.5
+local function upHS(s)
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        local h = char:FindFirstChild("Humanoid")
+        if h then
+            h.HipWidth = s
+            h.HipHeight = s
+            h.BodyWidthScale = 1.5
+            h.BodyHeightScale = 1.5
+            h.BodyDepthScale = 1.5
         end
     end
 end
 
--- Función para activar/expandir la hitbox
-local function hitboxExpander(enabled, size)
-    if enabled then
-        updateHitboxSize(size)
+local function hbExp(e, s)
+    if e then
+        upHS(s)
     else
-        updateHitboxSize(1) -- Tamaño por defecto
+        upHS(1)
     end
 end
 
--- Combat Tab
-local function combatTab(frame)
-    createSwitch(frame, "Silent Aim", getgenv().VlexusHub.features.silentAimEnabled, function(v)
-        getgenv().VlexusHub.features.silentAimEnabled = v
+local function crTb()
+    local p = game.Players.LocalPlayer
+    local sG = Instance.new("ScreenGui")
+    sG.Parent = p.PlayerGui
+
+    local mF = Instance.new("Frame")
+    mF.Size = UDim2.new(0, 400, 0, 400)
+    mF.BackgroundColor3 = getgenv().G.cS.b
+    mF.Position = UDim2.new(0.5, -200, 0.5, -200)
+    mF.Parent = sG
+
+    local cT = Instance.new("Frame")
+    cT.Size = UDim2.new(0, 380, 0, 300)
+    cT.BackgroundColor3 = getgenv().G.cS.b
+    cT.Position = UDim2.new(0, 10, 0, 50)
+    cT.Parent = mF
+
+    crSw(cT, "Silent Aim", getgenv().G.f.saE, function(v)
+        getgenv().G.f.saE = v
     end)
 
-    createSlider(frame, "Silent Aim Prediction", getgenv().VlexusHub.features.silentAimPrediction, 0, 1, function(v)
-        getgenv().VlexusHub.features.silentAimPrediction = v
+    crSl(cT, "Silent Aim Prediction", getgenv().G.f.saP, 0, 1, function(v)
+        getgenv().G.f.saP = v
     end)
 
-    createSwitch(frame, "Camlock", getgenv().VlexusHub.features.camlockEnabled, function(v)
-        getgenv().VlexusHub.features.camlockEnabled = v
+    crSw(cT, "Camlock", getgenv().G.f.clE, function(v)
+        getgenv().G.f.clE = v
     end)
 
-    createSlider(frame, "Camlock Prediction", getgenv().VlexusHub.features.camlockPrediction, 0, 1, function(v)
-        getgenv().VlexusHub.features.camlockPrediction = v
+    crSl(cT, "Camlock Prediction", getgenv().G.f.clP, 0, 1, function(v)
+        getgenv().G.f.clP = v
     end)
 
-    createSwitch(frame, "Hitbox Expander", getgenv().VlexusHub.features.hitboxExpanderEnabled, function(v)
-        getgenv().VlexusHub.features.hitboxExpanderEnabled = v
-        hitboxExpander(v, getgenv().VlexusHub.features.hitboxSize)
-    end)
-
-    -- Ajuste de tamaño de Hitbox
-    createSlider(frame, "Hitbox Size", getgenv().VlexusHub.features.hitboxSize, 25, getgenv().VlexusHub.features.maxHitboxSize, function(v)
-        getgenv().VlexusHub.features.hitboxSize = v
-        if getgenv().VlexusHub.features.hitboxExpanderEnabled then
-            hitboxExpander(true, v)
-        end
-    end)
-end
-
--- Movement Tab
-local function movementTab(frame)
-    createSwitch(frame, "Fly", getgenv().VlexusHub.features.flyEnabled, function(v)
-        getgenv().VlexusHub.features.flyEnabled = v
-    end)
-    createSwitch(frame, "Speed Hack", getgenv().VlexusHub.features.cframeSpeedEnabled, function(v)
-        getgenv().VlexusHub.features.cframeSpeedEnabled = v
-    end)
-    createSwitch(frame, "Super Jump", getgenv().VlexusHub.features.superJumpEnabled, function(v)
-        getgenv().VlexusHub.features.superJumpEnabled = v
-    end)
-    createSwitch(frame, "Dashes", getgenv().VlexusHub.features.dashesEnabled, function(v)
-        getgenv().VlexusHub.features.dashesEnabled = v
-    end)
-end
-
--- Rage Tab
-local function rageTab(frame)
-    createSwitch(frame, "Antiaim", getgenv().VlexusHub.features.antiaimEnabled, function(v)
-        getgenv().VlexusHub.features.antiaimEnabled = v
-    end)
-    createSwitch(frame, "Fake Lag", getgenv().VlexusHub.features.fakeLagEnabled, function(v)
-        getgenv().VlexusHub.features.fakeLagEnabled = v
-    end)
-    createSwitch(frame, "Quick Turn", getgenv().VlexusHub.features.quickTurnEnabled, function(v)
-        getgenv().VlexusHub.features.quickTurnEnabled = v
+    crSw(cT, "Hitbox Expander", getgenv().G.f.hBE, function(v)
+        getgenv().G.f.hBE = v
+        hbExp(v, getgenv().G.f.hS)
     end)
 end
