@@ -1,102 +1,212 @@
-getgenv().Vlexuscc = {
-    enabled = true,
-    name = "Vlexus",
-    version = "4.0",
+getgenv().VlexusHub = {
+    name = "Vlexus Hub",
+    version = "6.5",
+    tabs = {
+        "Aimbot",
+        "Visuals",
+        "Movement",
+        "Misc",
+        "World"
+    },
     colorScheme = {
-        background = Color3.fromRGB(30, 30, 30),
-        primary = Color3.fromRGB(85, 255, 255),
-        secondary = Color3.fromRGB(255, 0, 0),
+        background = Color3.fromRGB(20, 20, 20),
+        primary = Color3.fromRGB(31, 131, 255),
+        secondary = Color3.fromRGB(255, 85, 85),
         text = Color3.fromRGB(255, 255, 255),
-        active = Color3.fromRGB(50, 200, 50),
-        inactive = Color3.fromRGB(80, 80, 80)
+        highlight = Color3.fromRGB(0, 255, 0),
+        slider = Color3.fromRGB(200, 200, 200)
     },
     features = {
-        flyEnabled = false,
-        cframeEnabled = false,
-        godModeEnabled = false,
-        autoKillEnabled = false,
-        hitboxExpanderEnabled = false,
-        hitboxSize = 50,
-        predictionEnabled = false,
-        camlockEnabled = false,
+        aimbotEnabled = false,
+        fovCircleEnabled = false,
         silentAimEnabled = false,
-        silentAimFov = 50,
-        triggerbotEnabled = false,
-        predictionFov = 75,
         espEnabled = false,
-        chamEnabled = false,
-        fogEnabled = false,
-        boxEspEnabled = false,
-        lineEspEnabled = false,
-        nameEspEnabled = false,
-        healthBarEspEnabled = false,
-        distanceEspEnabled = false,
-        weaponEspEnabled = false,
-        noRecoilEnabled = false,
-        autoHealthEnabled = false,
-        fastWalkEnabled = false,
+        skeletonEsp = false,
+        boxEsp = false,
+        glowEsp = false,
+        healthBarEnabled = false,
+        flyEnabled = false,
         noClipEnabled = false,
-        antiLockEnabled = false,
-        desyncEnabled = false,
-        fakeLagEnabled = false
-    },
-    keybinds = {
-        flyKey = Enum.KeyCode.F,
-        camlockKey = Enum.KeyCode.G,
-        silentAimKey = Enum.KeyCode.H,
-        triggerbotKey = Enum.KeyCode.J
+        speedHackEnabled = false,
+        bunnyHopEnabled = false,
+        fakeLagEnabled = false,
+        atmosphereModifier = false,
+        customFogEnabled = false,
+        hitmarkerEnabled = true,
+        ragdollEnabled = true,
+        rapidFireEnabled = false,
+        autoAirEnabled = false,
+        customThemeEnabled = true,
     }
 }
 
-local VlexusHubGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
-VlexusHubGui.Name = "VlexusCC"
-VlexusHubGui.Parent = game:GetService("CoreGui")
+-- Función para crear un switch de encendido/apagado
+local function createSwitch(parent, label, value, callback)
+    local switchFrame = Instance.new("Frame", parent)
+    switchFrame.Size = UDim2.new(0, 200, 0, 40)
+    switchFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 
-local MainFrame = Instance.new("Frame", VlexusHubGui)
-MainFrame.Size = UDim2.new(0, 500, 0, 900)
-MainFrame.Position = UDim2.new(0.5, -250, 0.5, -450)
-MainFrame.BackgroundColor3 = getgenv().Vlexuscc.colorScheme.background
-MainFrame.BorderSizePixel = 0
-MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    local labelText = Instance.new("TextLabel", switchFrame)
+    labelText.Size = UDim2.new(0.7, 0, 1, 0)
+    labelText.Text = label
+    labelText.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-local MainCorner = Instance.new("UICorner", MainFrame)
-MainCorner.CornerRadius = UDim.new(0, 10)
+    local switchButton = Instance.new("TextButton", switchFrame)
+    switchButton.Size = UDim2.new(0.3, 0, 1, 0)
+    switchButton.Text = value and "On" or "Off"
+    switchButton.BackgroundColor3 = value and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
 
-local TitleLabel = Instance.new("TextLabel", MainFrame)
-TitleLabel.Size = UDim2.new(1, 0, 0, 60)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Font = Enum.Font.GothamBold
-TitleLabel.TextSize = 24
-TitleLabel.TextColor3 = getgenv().Vlexuscc.colorScheme.text
-TitleLabel.Text = "Vlexus Hub - " .. getgenv().Vlexuscc.name
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
-
-local function createFeatureButton(text, position, parent, callback)
-    local button = Instance.new("TextButton", parent)
-    button.Size = UDim2.new(0.8, 0, 0, 40)
-    button.Position = position
-    button.Text = text
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 18
-    button.TextColor3 = getgenv().Vlexuscc.colorScheme.text
-    button.BackgroundColor3 = getgenv().Vlexuscc.colorScheme.primary
-
-    button.MouseEnter:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(60, 60, 140)
+    switchButton.MouseButton1Click:Connect(function()
+        value = not value
+        switchButton.Text = value and "On" or "Off"
+        switchButton.BackgroundColor3 = value and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+        callback(value)
     end)
-    button.MouseLeave:Connect(function()
-        button.BackgroundColor3 = getgenv().Vlexuscc.colorScheme.primary
-    end)
-
-    button.MouseButton1Click:Connect(callback)
-    return button
 end
 
-local lockSectionFrame = Instance.new("Frame", MainFrame)
-lockSectionFrame.Size = UDim2.new(1, 0, 0, 180)
-lockSectionFrame.Position = UDim2.new(0, 0, 0.1, 0)
-lockSectionFrame.BackgroundTransparency = 1
+-- Función para habilitar el Auto Air con retraso
+local autoAirConnection
+local function enableAutoAir(enabled)
+    local player = game.Players.LocalPlayer
+    local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+    
+    if enabled then
+        if not autoAirConnection then
+            autoAirConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                if humanoid and humanoid.FloorMaterial == Enum.Material.Air then
+                    wait(0.45)
+                    if humanoid.FloorMaterial == Enum.Material.Air then
+                        local tool = player.Character:FindFirstChildOfClass("Tool")
+                        if tool and tool:FindFirstChild("Activate") then
+                            tool.Activate()
+                        end
+                    end
+                end
+            end)
+        end
+    else
+        if autoAirConnection then
+            autoAirConnection:Disconnect()
+            autoAirConnection = nil
+        end
+    end
+end
 
-local lockTitleLabel = Instance.new("TextLabel", lockSectionFrame)
-lockTitleLabel.Size = UDim2.new(1, 0, 0, 30)
-lockTitleLabel.BackgroundTransparency = 1
+-- Función para habilitar el Rapid Fire con un retraso de 0.2 segundos
+local rapidFireConnection
+local function enableRapidFire(enabled)
+    local player = game.Players.LocalPlayer
+    local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+    
+    if enabled then
+        if not rapidFireConnection then
+            rapidFireConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                if humanoid and humanoid.Health > 0 then
+                    wait(0.2) -- Delay de 0.2 segundos
+                    local tool = player.Character:FindFirstChildOfClass("Tool")
+                    if tool and tool:FindFirstChild("Activate") then
+                        tool.Activate()
+                    end
+                end
+            end)
+        end
+    else
+        if rapidFireConnection then
+            rapidFireConnection:Disconnect()
+            rapidFireConnection = nil
+        end
+    end
+end
+
+-- Función para crear las pestañas
+local function loadTabs(parentFrame)
+    local TabContainer = Instance.new("Frame", parentFrame)
+    TabContainer.Size = UDim2.new(0.25, 0, 1, -50)
+    TabContainer.Position = UDim2.new(0, 0, 0, 50)
+    TabContainer.BackgroundColor3 = getgenv().VlexusHub.colorScheme.primary
+
+    local TabUICorner = Instance.new("UICorner", TabContainer)
+    TabUICorner.CornerRadius = UDim.new(0, 12)
+
+    local ContentFrame = Instance.new("Frame", parentFrame)
+    ContentFrame.Size = UDim2.new(0.75, 0, 1, -50)
+    ContentFrame.Position = UDim2.new(0.25, 0, 0, 50)
+    ContentFrame.BackgroundColor3 = getgenv().VlexusHub.colorScheme.background
+    local ContentUICorner = Instance.new("UICorner", ContentFrame)
+    ContentUICorner.CornerRadius = UDim.new(0, 12)
+
+    -- Crear botones para las pestañas
+    for i, tabName in ipairs(getgenv().VlexusHub.tabs) do
+        local TabButton = Instance.new("TextButton", TabContainer)
+        TabButton.Size = UDim2.new(1, 0, 0, 40)
+        TabButton.Position = UDim2.new(0, 0, 0, (i - 1) * 45)
+        TabButton.Text = tabName
+        TabButton.Font = Enum.Font.Gotham
+        TabButton.TextColor3 = getgenv().VlexusHub.colorScheme.text
+        TabButton.BackgroundColor3 = getgenv().VlexusHub.colorScheme.background
+
+        TabButton.MouseButton1Click:Connect(function()
+            for _, child in pairs(ContentFrame:GetChildren()) do
+                child:Destroy()
+            end
+
+            -- Contenido de cada pestaña
+            if tabName == "Aimbot" then
+                createSwitch(ContentFrame, "Enable Aimbot", getgenv().VlexusHub.features.aimbotEnabled, function(value)
+                    getgenv().VlexusHub.features.aimbotEnabled = value
+                end)
+                createSwitch(ContentFrame, "Enable FOV Circle", getgenv().VlexusHub.features.fovCircleEnabled, function(value)
+                    getgenv().VlexusHub.features.fovCircleEnabled = value
+                end)
+                createSwitch(ContentFrame, "Enable Silent Aim", getgenv().VlexusHub.features.silentAimEnabled, function(value)
+                    getgenv().VlexusHub.features.silentAimEnabled = value
+                end)
+            elseif tabName == "Visuals" then
+                createSwitch(ContentFrame, "Enable ESP", getgenv().VlexusHub.features.espEnabled, function(value)
+                    getgenv().VlexusHub.features.espEnabled = value
+                end)
+                createSwitch(ContentFrame, "Enable Skeleton ESP", getgenv().VlexusHub.features.skeletonEsp, function(value)
+                    getgenv().VlexusHub.features.skeletonEsp = value
+                end)
+                createSwitch(ContentFrame, "Enable Glow ESP", getgenv().VlexusHub.features.glowEsp, function(value)
+                    getgenv().VlexusHub.features.glowEsp = value
+                end)
+            elseif tabName == "Movement" then
+                createSwitch(ContentFrame, "Enable Fly", getgenv().VlexusHub.features.flyEnabled, function(value)
+                    getgenv().VlexusHub.features.flyEnabled = value
+                end)
+                createSwitch(ContentFrame, "Enable SpeedHack", getgenv().VlexusHub.features.speedHackEnabled, function(value)
+                    getgenv().VlexusHub.features.speedHackEnabled = value
+                end)
+                createSwitch(ContentFrame, "Enable Rapid Fire", getgenv().VlexusHub.features.rapidFireEnabled, function(value)
+                    getgenv().VlexusHub.features.rapidFireEnabled = value
+                    enableRapidFire(value)
+                end)
+                createSwitch(ContentFrame, "Enable Auto Air", getgenv().VlexusHub.features.autoAirEnabled, function(value)
+                    getgenv().VlexusHub.features.autoAirEnabled = value
+                    enableAutoAir(value)
+                end)
+            elseif tabName == "Misc" then
+                createSwitch(ContentFrame, "Enable Fake Lag", getgenv().VlexusHub.features.fakeLagEnabled, function(value)
+                    getgenv().VlexusHub.features.fakeLagEnabled = value
+                end)
+                createSwitch(ContentFrame, "Enable Ragdoll", getgenv().VlexusHub.features.ragdollEnabled, function(value)
+                    getgenv().VlexusHub.features.ragdollEnabled = value
+                end)
+            elseif tabName == "World" then
+                createSwitch(ContentFrame, "Modify Atmosphere", getgenv().VlexusHub.features.atmosphereModifier, function(value)
+                    getgenv().VlexusHub.features.atmosphereModifier = value
+                end)
+            end
+        end)
+    end
+
+    return ContentFrame
+end
+
+-- Inicializar la GUI y las funcionalidades
+local function createGui()
+    local VlexusGui = Instance.new("ScreenGui")
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0.4, 0, 0.6, 0)
+    MainFrame.Position = UDim2.new(0.3,
