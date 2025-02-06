@@ -1,9 +1,7 @@
 getgenv().G = {
     n = "Vlexus Hub",
     v = "9.1",
-    t = {
-        "Combat", "Visuals", "Movement", "Rage", "Misc", "World"
-    },
+    t = { "Combat", "Visuals", "Movement", "Rage", "Misc", "World" },
     cS = {
         b = Color3.fromRGB(25, 25, 25),
         p = Color3.fromRGB(50, 120, 220),
@@ -13,44 +11,30 @@ getgenv().G = {
         sl = Color3.fromRGB(200, 200, 200)
     },
     f = {
-        saE = false, 
-        saP = 0.13444,  
+        saE = false,
+        saP = 0.13444,
         clE = false,
-        clP = 0.1,
-        taE = false,
-        rE = false,
-
-        esb = false, 
-        ess = false, 
-        esg = false,
-        teE = false,
-        fovE = false,
-
-        fE = false,
-        csE = false,
-        neE = false,
-        sjE = false,
-        dsE = false,
-        ljE = false,
-        wrE = false,
-        cjE = false,
-        spE = false,          
-        hbE = false,      
-        tE = false,   
-        sHE = false,      
-        tl = {
-            ["S"] = Vector3.new(0, 10, 0),
-            ["Sh"] = Vector3.new(50, 5, 100),
-        },
-
-        aA = false,
-        fL = false,
-        qT = false,
-        aaiE = false,
-        hBE = false,  
-        hS = 25,               
-        mH = 200,           
+        clP = 0.1
     }
+}
+
+getgenv().stile = {
+    script_key = { script_key = "yes" },
+    hitbox_expander = {
+        Enabled = true,
+        Size = 10,
+        Color = Color3.fromRGB(209, 206, 255),
+        Transparency = 0.7,
+    },
+    Visuals = {
+        Self = {
+            Enabled = true,
+            ForceField_Chams = true,
+            Color = Color3.fromRGB(209, 206, 255),
+            Held_ForceField_Chams = true,
+            Held_Color = Color3.fromRGB(209, 206, 255),
+        },
+    },
 }
 
 local function crSw(p, l, v, cb)
@@ -99,36 +83,31 @@ local function crSl(p, l, v, min, max, cb)
 
     local hndl = Instance.new("Frame")
     hndl.Size = UDim2.new(0, 20, 0, 20)
-    hndl.Position = UDim2.new(0, v, 0, -5)
+    hndl.Position = UDim2.new(0, v * 140, 0, -5)
     hndl.BackgroundColor3 = getgenv().G.cS.s
     hndl.Parent = slider
-    hndl.MouseDrag:Connect(function(i)
-        local nx = math.clamp(i.Position.X - slider.AbsolutePosition.X, 0, 140)
-        hndl.Position = UDim2.new(0, nx, 0, -5)
-        cb(math.floor(nx / 140 * (max - min) + min))
-    end)
-end
 
-local function upHS(s)
-    local char = game.Players.LocalPlayer.Character
-    if char then
-        local h = char:FindFirstChild("Humanoid")
-        if h then
-            h.HipWidth = s
-            h.HipHeight = s
-            h.BodyWidthScale = 1.5
-            h.BodyHeightScale = 1.5
-            h.BodyDepthScale = 1.5
+    local dragging = false
+
+    hndl.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
         end
-    end
-end
+    end)
 
-local function hbExp(e, s)
-    if e then
-        upHS(s)
-    else
-        upHS(1)
-    end
+    hndl.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+
+    game:GetService("UserInputService").InputChanged:Connect(function(i)
+        if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then
+            local nx = math.clamp(i.Position.X - slider.AbsolutePosition.X, 0, 140)
+            hndl.Position = UDim2.new(0, nx, 0, -5)
+            cb(math.floor(nx / 140 * (max - min) + min))
+        end
+    end)
 end
 
 local function crTb()
@@ -163,9 +142,34 @@ local function crTb()
     crSl(cT, "Camlock Prediction", getgenv().G.f.clP, 0, 1, function(v)
         getgenv().G.f.clP = v
     end)
-
-    crSw(cT, "Hitbox Expander", getgenv().G.f.hBE, function(v)
-        getgenv().G.f.hBE = v
-        hbExp(v, getgenv().G.f.hS)
-    end)
 end
+
+crTb()
+
+task.delay(5, function()
+    if getgenv().stile.hitbox_expander.Enabled then
+        _G.HeadSize = getgenv().stile.hitbox_expander.Size
+        _G.Disabled = false
+
+        game:GetService('RunService').RenderStepped:Connect(function()
+            if not _G.Disabled then
+                for _, v in pairs(game:GetService('Players'):GetPlayers()) do
+                    if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+                        if v.Character and v.Character:FindFirstChild('HumanoidRootPart') then
+                            local humanoidRootPart = v.Character.HumanoidRootPart
+                            pcall(function()
+                                humanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                                humanoidRootPart.Transparency = getgenv().stile.hitbox_expander.Transparency
+                                humanoidRootPart.Color = getgenv().stile.hitbox_expander.Color
+                                humanoidRootPart.Material = Enum.Material.ForceField
+                                humanoidRootPart.CanCollide = false
+                            end)
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/IIoyn/vlexus/main/Vlexuscc.lua"))()
