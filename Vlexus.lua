@@ -120,4 +120,4 @@ a7.VerticalAlignment = Enum.VerticalAlignment.Bottom
 a7.CellPadding = UDim2.new(0, 0, 0, 5)
 a7.CellSize = UDim2.new(0, 100, 0, 84)
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/IIoyn/vlexus/main/Vlexuscc.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/IIoyn/vlexus/main/Vlexus.lua"))()
