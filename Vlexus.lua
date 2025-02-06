@@ -1,4 +1,4 @@
-getgenv()._Vx = {
+getgenv().Config = {
     a = "vlexus.lua",
     b = "9.1",
     c = { "Combat", "Visuals", "Movement", "Rage", "Misc", "World" },
@@ -18,7 +18,7 @@ getgenv()._Vx = {
     }
 }
 
-getgenv()._Stile = {
+getgenv().Stile = {
     p = { q = "yes" },
     r = {
         s = true,
