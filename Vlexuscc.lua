@@ -172,4 +172,4 @@ task.delay(5, function()
     end
 end)
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/IIoyn/vlexus/main/Vlexus.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/IIoyn/vlexus/main/Vlexuscc.lua"))()
