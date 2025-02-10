@@ -1,9 +1,9 @@
 getgenv().Vlexus = {
-    Camlock = false,
+    Camlock = 0.1433,
     Speed = false,
     ESP = false,
     HitboxExpander = true,
-    Triggerbot = false
+    Triggerbot = 0.1433
 }
 
 local players = game:GetService("Players")
@@ -15,7 +15,7 @@ local weapon = nil
 local speedValue = 3
 local camlockedTarget = nil
 local lastPosition = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") and localPlayer.Character.HumanoidRootPart.Position or Vector3.new()
-local triggerbotDelay = 0.01
+local triggerbotDelay = getgenv().Vlexus.Triggerbot
 local triggerbotRange = 350
 
 local screenGui = Instance.new("ScreenGui")
@@ -66,8 +66,8 @@ local function fireWeapon()
 end
 
 local camlockButton = createButton("Camlock", "Camlock OFF", UDim2.new(0.05, 0, 0.1, 0), function(button)
-    getgenv().Vlexus.Camlock = not getgenv().Vlexus.Camlock
-    if getgenv().Vlexus.Camlock then
+    getgenv().Vlexus.Camlock = getgenv().Vlexus.Camlock == 0.1433 and 0 or 0.1433
+    if getgenv().Vlexus.Camlock == 0.1433 then
         camlockedTarget = getClosestPlayer()
         button.Text = "Camlock ON"
     else
@@ -77,7 +77,7 @@ local camlockButton = createButton("Camlock", "Camlock OFF", UDim2.new(0.05, 0, 
 end)
 
 runService.RenderStepped:Connect(function()
-    if getgenv().Vlexus.Camlock and camlockedTarget and camlockedTarget:FindFirstChild("HumanoidRootPart") then
+    if getgenv().Vlexus.Camlock == 0.1433 and camlockedTarget and camlockedTarget:FindFirstChild("HumanoidRootPart") then
         workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, camlockedTarget.HumanoidRootPart.Position)
     end
 end)
@@ -91,8 +91,10 @@ runService.Heartbeat:Connect(function()
     local humanoidRootPart = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")
     if humanoidRootPart then
         local currentPosition = humanoidRootPart.Position
-        if getgenv().Vlexus.Speed and (currentPosition - lastPosition).Magnitude > 0 then
+        if getgenv().Vlexus.Speed then
             humanoidRootPart.CFrame = humanoidRootPart.CFrame + humanoidRootPart.CFrame.LookVector * speedValue
+        else
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame
         end
         lastPosition = currentPosition
     end
@@ -130,7 +132,7 @@ local espButton = createButton("ESP", "ESP OFF", UDim2.new(0.05, 0, 0.3, 0), fun
 end)
 
 local function triggerbot()
-    if getgenv().Vlexus.Triggerbot then
+    if getgenv().Vlexus.Triggerbot == 0.1433 then
         local closestPlayer = getClosestPlayer()
         if closestPlayer then
             wait(triggerbotDelay)
@@ -140,8 +142,8 @@ local function triggerbot()
 end
 
 local triggerbotButton = createButton("Triggerbot", "Triggerbot OFF", UDim2.new(0.05, 0, 0.4, 0), function(button)
-    getgenv().Vlexus.Triggerbot = not getgenv().Vlexus.Triggerbot
-    button.Text = getgenv().Vlexus.Triggerbot and "Triggerbot ON" or "Triggerbot OFF"
+    getgenv().Vlexus.Triggerbot = getgenv().Vlexus.Triggerbot == 0.1433 and 0 or 0.1433
+    button.Text = getgenv().Vlexus.Triggerbot == 0.1433 and "Triggerbot ON" or "Triggerbot OFF"
 end)
 
 runService.RenderStepped:Connect(function()
