@@ -1,123 +1,165 @@
-getgenv().Config = {
-    a = "vlexus.lua",
-    b = "9.1",
-    c = { "Combat", "Visuals", "Movement", "Rage", "Misc", "World" },
-    d = {
-        e = Color3.fromRGB(25, 25, 25),
-        f = Color3.fromRGB(50, 120, 220),
-        g = Color3.fromRGB(220, 70, 70),
-        h = Color3.fromRGB(255, 255, 255),
-        i = Color3.fromRGB(80, 200, 120),
-        j = Color3.fromRGB(200, 200, 200)
-    },
-    k = {
-        l = false,
-        m = 0.13444,
-        n = false,
-        o = 0.1
-    }
+getgenv().Vlexus = {
+    Camlock = false,
+    Speed = false,
+    ESP = false,
+    HitboxExpander = true,
+    Triggerbot = false
 }
 
-getgenv().Stile = {
-    p = { q = "yes" },
-    r = {
-        s = true,
-        t = 10,
-        u = Color3.fromRGB(209, 206, 255),
-        v = 0.7,
-    },
-    w = {
-        x = {
-            y = true,
-            z = true,
-            aa = Color3.fromRGB(209, 206, 255),
-            ab = true,
-            ac = Color3.fromRGB(209, 206, 255),
-        },
-    },
-}
+local players = game:GetService("Players")
+local runService = game:GetService("RunService")
+local localPlayer = players.LocalPlayer
+local mouse = localPlayer:GetMouse()
+local weapon = nil
 
-for _, _ in pairs(game.CoreGui:GetChildren()) do
-    if _.Name == "vlexus.lua" then
-        _.Destroy()
+local speedValue = 3
+local camlockedTarget = nil
+local lastPosition = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") and localPlayer.Character.HumanoidRootPart.Position or Vector3.new()
+local triggerbotDelay = 0.01
+local triggerbotRange = 350
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.CoreGui
+
+local function createButton(name, text, position, callback)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 80, 0, 40)
+    button.Position = position
+    button.Text = text
+    button.BackgroundTransparency = 1
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.SourceSansBold
+    button.TextSize = 14
+    button.Parent = screenGui
+    button.Draggable = true
+    button.AutoButtonColor = true
+
+    button.MouseButton1Click:Connect(function()
+        callback(button)
+    end)
+
+    return button
+end
+
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+
+    for _, player in pairs(players:GetPlayers()) do
+        if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local char = player.Character
+            local hrp = char.HumanoidRootPart
+            local distance = (localPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
+
+            if distance < shortestDistance and distance <= triggerbotRange then
+                closestPlayer = char
+                shortestDistance = distance
+            end
+        end
+    end
+    return closestPlayer
+end
+
+local function fireWeapon()
+    if weapon then
     end
 end
 
-local a1 = Instance.new("ScreenGui")
-local a2 = Instance.new("Frame")
-local a3 = Instance.new("Frame")
-local a4 = Instance.new("UIGradient")
-local a5 = Instance.new("Frame")
-local a6 = Instance.new("ImageButton")
-local a7 = Instance.new("UIGridLayout")
-local a8 = Instance.new("ImageButton")
-local a9 = Instance.new("ImageButton")
-local a10 = Instance.new("ImageButton")
-local a11 = Instance.new("ImageButton")
-local a12 = Instance.new("ImageButton")
-local a13 = Instance.new("ImageButton")
-local a14 = Instance.new("ImageButton")
-local a15 = Instance.new("Frame")
-local a16 = Instance.new("Frame")
-local a17 = Instance.new("TextLabel")
-local a18 = Instance.new("Frame")
-local a19 = Instance.new("TextLabel")
-local a20 = Instance.new("TextButton")
-local a21 = Instance.new("TextLabel")
-local a22 = Instance.new("Frame")
-local a23 = Instance.new("Frame")
-local a24 = Instance.new("TextLabel")
-local a25 = Instance.new("Frame")
-local a26 = Instance.new("TextLabel")
-local a27 = Instance.new("TextButton")
-local a28 = Instance.new("TextLabel")
-local a29 = Instance.new("TextLabel")
-local a30 = Instance.new("TextButton")
+local camlockButton = createButton("Camlock", "Camlock OFF", UDim2.new(0.05, 0, 0.1, 0), function(button)
+    getgenv().Vlexus.Camlock = not getgenv().Vlexus.Camlock
+    if getgenv().Vlexus.Camlock then
+        camlockedTarget = getClosestPlayer()
+        button.Text = "Camlock ON"
+    else
+        camlockedTarget = nil
+        button.Text = "Camlock OFF"
+    end
+end)
 
-a1.Name = "vlexus.lua"
-a1.Parent = game.CoreGui
-a1.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+runService.RenderStepped:Connect(function()
+    if getgenv().Vlexus.Camlock and camlockedTarget and camlockedTarget:FindFirstChild("HumanoidRootPart") then
+        workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, camlockedTarget.HumanoidRootPart.Position)
+    end
+end)
 
-a2.Name = "Panel"
-a2.Parent = a1
-a2.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-a2.BorderSizePixel = 0
-a2.Position = UDim2.new(0, 439, 0, 96)
-a2.Size = UDim2.new(0, 800, 0, 650)
+local speedButton = createButton("Speed", "Speed OFF", UDim2.new(0.05, 0, 0.2, 0), function(button)
+    getgenv().Vlexus.Speed = not getgenv().Vlexus.Speed
+    button.Text = getgenv().Vlexus.Speed and "Speed ON" or "Speed OFF"
+end)
 
-a3.Name = "Gradient"
-a3.Parent = a2
-a3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-a3.BorderSizePixel = 0
-a3.Position = UDim2.new(0, 10, 0, 10)
-a3.Size = UDim2.new(0, 780, 0, 3)
+runService.Heartbeat:Connect(function()
+    local humanoidRootPart = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if humanoidRootPart then
+        local currentPosition = humanoidRootPart.Position
+        if getgenv().Vlexus.Speed and (currentPosition - lastPosition).Magnitude > 0 then
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame + humanoidRootPart.CFrame.LookVector * speedValue
+        end
+        lastPosition = currentPosition
+    end
+end)
 
-a4.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(14, 163, 180)), ColorSequenceKeypoint.new(0.26, Color3.fromRGB(25, 96, 184)), ColorSequenceKeypoint.new(0.52, Color3.fromRGB(169, 21, 255)), ColorSequenceKeypoint.new(0.77, Color3.fromRGB(190, 202, 20)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(243, 255, 25))}
-a4.Parent = a3
+local espButton = createButton("ESP", "ESP OFF", UDim2.new(0.05, 0, 0.3, 0), function(button)
+    getgenv().Vlexus.ESP = not getgenv().Vlexus.ESP
+    button.Text = getgenv().Vlexus.ESP and "ESP ON" or "ESP OFF"
 
-a5.Name = "Sections"
-a5.Parent = a2
-a5.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-a5.BorderSizePixel = 0
-a5.Position = UDim2.new(0, 10, 0, 15)
-a5.Size = UDim2.new(0, 110, 0, 625)
+    if getgenv().Vlexus.ESP then
+        for _, player in pairs(players:GetPlayers()) do
+            if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = player.Character.HumanoidRootPart
+                local box = Instance.new("BoxHandleAdornment")
+                box.Size = Vector3.new(4, 6, 4)
+                box.Adornee = hrp
+                box.Color3 = Color3.new(1, 0, 0)
+                box.Transparency = 0.5
+                box.ZIndex = 0
+                box.AlwaysOnTop = true
+                box.Parent = game:GetService("CoreGui")
 
-a6.Name = "AimbotTab"
-a6.Parent = a5
-a6.BackgroundColor3 = Color3.fromRGB(255, 0, 4)
-a6.BorderSizePixel = 0
-a6.Position = UDim2.new(0.0454545468, 0, 0, 0)
-a6.Size = UDim2.new(0, 100, 0, 85)
-a6.Image = "rbxassetid://12977951813"
-a6.ImageColor3 = Color3.fromRGB(200, 200, 200)
-a6.ScaleType = Enum.ScaleType.Crop
+                hrp:GetPropertyChangedSignal("Position"):Connect(function()
+                    box.CFrame = CFrame.new(hrp.Position)
+                end)
+            end
+        end
+    else
+        for _, obj in pairs(game:GetService("CoreGui"):GetChildren()) do
+            if obj:IsA("BoxHandleAdornment") then
+                obj:Destroy()
+            end
+        end
+    end
+end)
 
-a7.Name = "Layout"
-a7.Parent = a5
-a7.HorizontalAlignment = Enum.HorizontalAlignment.Center
-a7.SortOrder = Enum.SortOrder.LayoutOrder
-a7.VerticalAlignment = Enum.VerticalAlignment.Bottom
-a7.CellPadding = UDim2.new(0, 0, 0, 5)
-a7.CellSize = UDim2.new(0, 100, 0, 84)
+local function triggerbot()
+    if getgenv().Vlexus.Triggerbot then
+        local closestPlayer = getClosestPlayer()
+        if closestPlayer then
+            wait(triggerbotDelay)
+            fireWeapon()
+        end
+    end
+end
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/IIoyn/vlexus/main/Vlexus.lua"))()
+local triggerbotButton = createButton("Triggerbot", "Triggerbot OFF", UDim2.new(0.05, 0, 0.4, 0), function(button)
+    getgenv().Vlexus.Triggerbot = not getgenv().Vlexus.Triggerbot
+    button.Text = getgenv().Vlexus.Triggerbot and "Triggerbot ON" or "Triggerbot OFF"
+end)
+
+runService.RenderStepped:Connect(function()
+    triggerbot()
+end)
+
+local function expandHitbox(player)
+    if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = player.Character.HumanoidRootPart
+        hrp.Size = Vector3.new(20, 20, 20)
+        hrp.Transparency = 0.7
+        hrp.Material = Enum.Material.ForceField
+    end
+end
+
+if getgenv().Vlexus.HitboxExpander then
+    for _, player in pairs(players:GetPlayers()) do
+        expandHitbox(player)
+    end
+    players.PlayerAdded:Connect(expandHitbox)
+end
