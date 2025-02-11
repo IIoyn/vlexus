@@ -233,5 +233,5 @@ local function intro()
     end)
 end
 
--- Llamamos a la función de introducción
+-- helo
 intro()
